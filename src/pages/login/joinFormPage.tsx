@@ -7,11 +7,11 @@ const JoinFormPage = () : JSX.Element => {
         password: '',
         confirmPassword: '',
         username: '',
+        phone: '',
         email: '',
         address: '',
         detailedAddress: '',
-        zipcode: '',
-        phone: '',
+        zipcode: ''
     });
 
     const handelAddressSearch = () => {
@@ -158,8 +158,8 @@ const ButtonGroup = styled.div`
 
 const Button = styled.button<{ bgColor: string; border?: boolean }>`
     width: 100%;
-    background-color: ${(props) => props.bgColor};  // bgColor 적용
-    color: ${(props) => (props.bgColor === '#FF5D5D' ? 'white' : 'black')};  // 배경색이 #FF5D5D일 때만 흰색 텍스트
+    background-color: ${(props) => props.bgColor};  // 
+    color: ${(props) => (props.bgColor === '#FF5D5D' ? 'white' : 'black')};  
     padding: 1rem;
     border-radius: 5px;
     font-size: 1rem;
