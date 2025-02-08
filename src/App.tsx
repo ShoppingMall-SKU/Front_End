@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { MainPage } from "./pages/main/mainPage";
 import { NavBar } from "./components/navBar";
 import { Footer } from "./components/footer";
+import { ProductDetail } from "./pages/product/productDetail";
 
 import JoinPage from "./pages/login/joinPage";
 import LoginPage from "./pages/login/loginPage"
@@ -15,7 +16,7 @@ import JoinFormPage from "./pages/login/joinFormPage";
 
 
 const App = () => {
-   const ignoreNavPaths = ["", ""];
+	const ignoreNavPaths = ["", ""];
 
    return (
       <div>
@@ -37,9 +38,6 @@ const App = () => {
             </Routes>
          </BrowserRouter>
          <Footer />
-
-
-         
       </div>
    );
 };
