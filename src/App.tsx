@@ -10,6 +10,7 @@ import MyOrder from "./pages/my/myOrder";
 import MyModify from "./pages/my/myModify";
 import MyReview from "./pages/my/myReview";
 import MyQA from "./pages/my/myQA";
+import JoinFormPage from "./pages/login/joinFormPage";
 
 
 
@@ -25,6 +26,7 @@ const App = () => {
                <Route path="/" element={<MainPage />} />
 
                <Route path="/member/login" element={<LoginPage />} />
+               <Route path="/member/joinform" element={<JoinFormPage />} />
                <Route path="/member/join" element={<JoinPage />} />
                
                <Route path="/my/order" element={<MyOrder />} />

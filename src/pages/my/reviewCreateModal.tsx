@@ -1,19 +1,49 @@
 import styled from "styled-components";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Order} from './myOrderList'
 
 interface ReviewCreateModalProps {
     order: Order;
     onClose: () => void;
-    onSubmit: (reviewData: {title:string, content: string, rating: number, image: File | null}) => void;
+    existingReview?: {
+        title: string;
+        content: string;
+        rating: number;
+        image?: string;
+        reviewDate?: string;
+        lastDate?: string;
+        reviewStatus?: '미작성' | '작성완료';  
+    };
+    onSubmit: (reviewData: {
+        title: string;
+        content: string;
+        rating: number;
+        image: File | null;
+        reviewDate: string;
+        lastDate?: string;
+        reviewStatus: '미작성' | '작성완료';  
+    }) => void;
 }
 
-const ReviewCreateModal: React.FC<ReviewCreateModalProps> = ({onClose, onSubmit}) => {
 
-    const [title, setTitle] = useState('');
-    const [content, setContent] = useState('');
-    const [rating, setRating] = useState(0);
+const ReviewCreateModal: React.FC<ReviewCreateModalProps> = ({onClose, onSubmit, existingReview}) => {
+
+    const [title, setTitle] = useState(existingReview?.title || '');
+    const [content, setContent] = useState(existingReview?.content || '');
+    const [rating, setRating] = useState(existingReview?.rating || 0);
     const [image, setImage] = useState<File | null>(null);
+    const [previewImage, setPreviewImage] = useState(existingReview?.image || '');
+    const [reviewDate] = useState(existingReview?.reviewDate || new Date().toISOString());
+    const [lastDate, setLastDate] = useState(existingReview?.lastDate || '');
+    const [reviewStatus, setReviewStatus] = useState<'미작성' | '작성완료'>(existingReview?.reviewStatus ?? '미작성');  
+
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
 
     const handleRating = (value: number) => {
         setRating(value);
@@ -23,18 +53,46 @@ const ReviewCreateModal: React.FC<ReviewCreateModalProps> = ({onClose, onSubmit}
         e.preventDefault();
         if (e.dataTransfer.files && e.dataTransfer.files[0]) {
             setImage(e.dataTransfer.files[0]);
+            setPreviewImage(URL.createObjectURL(e.dataTransfer.files[0]));
         }
     };
 
     const handleSubmit = () => {
-        onSubmit({title, content, rating, image});
-        
-    }
+        if (!title || !content || rating === 0) {
+            alert("제목, 내용, 별점을 입력해주세요");
+            return;
+        }
+    
+        const updatedLastDate = new Date().toISOString();
+    
+        const reviewData = {
+            title,
+            content,
+            rating,
+            image,
+            reviewDate: formatDate(reviewDate),
+            lastDate: existingReview ? formatDate(updatedLastDate) : undefined,
+            reviewStatus: '작성완료',
+        } as const;
+
+        console.log("reviewCreateModal : onSubmit 호출", reviewData);
+    
+        onSubmit(reviewData);
+    
+        if (existingReview) {
+            onSubmit(reviewData);
+            alert('리뷰가 수정되었습니다');
+        } else {
+            onSubmit(reviewData)
+            alert('리뷰가 작성되었습니다')
+        }
+        onClose();
+    };
 
     return (
         <ModalOverlay onClick={onClose}>
             <ModalContainer onClick={(e) => e.stopPropagation()}>
-                <Title>리뷰작성</Title>
+                <Title>리뷰 {existingReview?'수정':'작성'}</Title>
                 <FormGroup>
                     <Label>제목</Label>
                     <Input 
@@ -73,9 +131,8 @@ const ReviewCreateModal: React.FC<ReviewCreateModalProps> = ({onClose, onSubmit}
                     <ImageUpload
                         onDragOver={(e) => e.preventDefault()}
                         onDrop={handleImageDrop}>
-                        
-                        {image ? (
-                            <p>{image.name}</p>
+                        {image || previewImage ? (
+                            <img src={previewImage} alt="리뷰 이미지" style={{ maxWidth: '100px', maxHeight: '100px' }} />
                         ) : (
                             <p>이미지를 업로드하세요</p>
                         )}
@@ -84,7 +141,7 @@ const ReviewCreateModal: React.FC<ReviewCreateModalProps> = ({onClose, onSubmit}
 
 
                 <ButtonGroup>
-                    <Button bgColor="black">리뷰등록</Button>
+                    <Button bgColor="black" onClick={handleSubmit}>리뷰{existingReview ?'수정':'등록'}</Button>
                     <Button bgColor="white" onClick={onClose}>취소</Button>
                 </ButtonGroup>
 
@@ -184,6 +241,8 @@ const ImageUpload = styled.div`
         width: 100%
     }
 `;
+
+
 
 
 const ButtonGroup = styled.div`

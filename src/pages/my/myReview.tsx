@@ -11,25 +11,24 @@ interface MyReviewProps {
     onDeleteReview?: (orderNumber: string) => void;
   }
 
-const MyReview: React.FC<MyReviewProps> = ({
-    onWriteReview,
-    onEditReview,
-    onDeleteReview,
-}) => {
+const MyReview: React.FC = () => {
 
     const [selectedTab, setSelectedTab] = useState<'writable'|'written'>('writable');
     const [isEmpty, setIsEmpty] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 6;
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+    const [isReviewDetailModalOpen, setIsReviewDetailModalOpen] = useState(false);
 
-    const reviews: Review[] = [
+    const [reviews, setReviews] = useState<Review[]>([
+
+
         {
             order: {
                 date: '2024-3-20',
-                ordernumber: '54321678',
-                brand: '브랜드4',
-                productname: '짬뽕',
+                ordernumber: '54321677',
+                brand: '브랜드1',
+                productname: '짜장면',
                 quantity: 1,
                 price: 9900,
                 status: '배송완료',
@@ -37,149 +36,180 @@ const MyReview: React.FC<MyReviewProps> = ({
                 isPurchased: true
             }
         },
-        {
-            order: {
-                date: '2024-3-20',
-                ordernumber: '54321678',
-                brand: '브랜드4',
-                productname: '짬뽕',
-                quantity: 1,
-                price: 9900,
-                status: '배송완료',
-                refundStatus: undefined,
-                isPurchased: false 
-            },
-            reviewDate: '2025-01-20',
-            reviewTitle: '맛있어요',
-            rating: 5,
-            reviewContent: '정말 맛있어요!!',
-            reviewStatus: '작성완료',
-        },
-        {
-            order: {
-                date: '2024-2-18',
-                ordernumber: '13572461',
-                brand: '브랜드5',
-                productname: '크림새우1',
-                quantity: 2,
-                price: 17800,
-                status: '배송완료',
-                refundStatus: undefined,
-                isPurchased: false
-            },
-            reviewDate: '2025-01-22', 
-            reviewTitle: '추천합니다',
-            rating: 3,
-            reviewContent: '추천하는 상품입니다',
-            reviewStatus: '작성완료',
-        },{
-            order: {
-                date: '2024-2-18',
-                ordernumber: '13572462',
-                brand: '브랜드5',
-                productname: '크림새우2',
-                quantity: 2,
-                price: 17800,
-                status: '배송완료',
-                refundStatus: undefined,
-                isPurchased: false
-            },
-            reviewDate: '2025-01-22', 
-            reviewTitle: '추천합니다',
-            rating: 3,
-            reviewContent: '추천하는 상품입니다',
-            reviewStatus: '작성완료',
-        },
-        {
-            order: {
-                date: '2024-2-18',
-                ordernumber: '13572463',
-                brand: '브랜드5',
-                productname: '크림새우3',
-                quantity: 2,
-                price: 17800,
-                status: '배송완료',
-                refundStatus: undefined,
-                isPurchased: false
-            },
-            reviewDate: '2025-01-22', 
-            reviewTitle: '추천합니다',
-            rating: 3,
-            reviewContent: '추천하는 상품입니다',
-            reviewStatus: '작성완료',
-        },{
-            order: {
-                date: '2024-2-18',
-                ordernumber: '13572464',
-                brand: '브랜드5',
-                productname: '크림새우4',
-                quantity: 2,
-                price: 17800,
-                status: '배송완료',
-                refundStatus: undefined,
-                isPurchased: false
-            },
-            reviewDate: '2025-01-22', 
-            reviewTitle: '추천합니다',
-            rating: 3,
-            reviewContent: '추천하는 상품입니다',
-            reviewStatus: '작성완료',
-        },
-        {
-            order: {
-                date: '2024-2-18',
-                ordernumber: '13572465',
-                brand: '브랜드5',
-                productname: '크림새우5',
-                quantity: 2,
-                price: 17800,
-                status: '배송완료',
-                refundStatus: undefined,
-                isPurchased: false
-            },
-            reviewDate: '2025-01-22', 
-            reviewTitle: '추천합니다',
-            rating: 3,
-            reviewContent: '추천하는 상품입니다',
-            reviewStatus: '작성완료',
-        },
-        {
-            order: {
-                date: '2024-2-18',
-                ordernumber: '13572466',
-                brand: '브랜드5',
-                productname: '크림새우6',
-                quantity: 2,
-                price: 17800,
-                status: '배송완료',
-                refundStatus: undefined,
-                isPurchased: false
-            },
-            reviewDate: '2025-01-22', 
-            reviewTitle: '추천합니다',
-            rating: 3,
-            reviewContent: '추천하는 상품입니다',
-            reviewStatus: '작성완료',
-        },
-        {
-            order: {
-                date: '2024-2-18',
-                ordernumber: '13572467',
-                brand: '브랜드5',
-                productname: '크림새우7',
-                quantity: 2,
-                price: 17800,
-                status: '배송완료',
-                refundStatus: undefined,
-                isPurchased: false
-            },
-            reviewDate: '2025-01-22', 
-            reviewTitle: '추천합니다',
-            rating: 3,
-            reviewContent: '추천하는 상품입니다',
-            reviewStatus: '작성완료',
-        }
-    ];
+        // {
+        //     order: {
+        //         date: '2024-3-20',
+        //         ordernumber: '54321678',
+        //         brand: '브랜드4',
+        //         productname: '짬뽕',
+        //         quantity: 1,
+        //         price: 9900,
+        //         status: '배송완료',
+        //         refundStatus: undefined,
+        //         isPurchased: false 
+        //     },
+        //     reviewDate: '2025-01-29',
+        //     reviewTitle: '맛있어요',
+        //     rating: 5,
+        //     reviewContent: '정말 맛있어요!!',
+        //     reviewStatus: '작성완료',
+        // },
+        // {
+        //     order: {
+        //         date: '2024-2-18',
+        //         ordernumber: '13572461',
+        //         brand: '브랜드5',
+        //         productname: '크림새우1',
+        //         quantity: 2,
+        //         price: 17800,
+        //         status: '배송완료',
+        //         refundStatus: undefined,
+        //         isPurchased: false
+        //     },
+        //     reviewDate: '2025-01-22', 
+        //     reviewTitle: '추천합니다',
+        //     rating: 3,
+        //     reviewContent: '추천하는 상품입니다',
+        //     reviewStatus: '작성완료',
+        // },{
+        //     order: {
+        //         date: '2024-2-18',
+        //         ordernumber: '13572462',
+        //         brand: '브랜드5',
+        //         productname: '크림새우2',
+        //         quantity: 2,
+        //         price: 17800,
+        //         status: '배송완료',
+        //         refundStatus: undefined,
+        //         isPurchased: false
+        //     },
+        //     reviewDate: '2025-01-22', 
+        //     reviewTitle: '추천합니다',
+        //     rating: 3,
+        //     reviewContent: '추천하는 상품입니다',
+        //     reviewStatus: '작성완료',
+        // },
+        // {
+        //     order: {
+        //         date: '2024-2-18',
+        //         ordernumber: '13572463',
+        //         brand: '브랜드5',
+        //         productname: '크림새우3',
+        //         quantity: 2,
+        //         price: 17800,
+        //         status: '배송완료',
+        //         refundStatus: undefined,
+        //         isPurchased: false
+        //     },
+        //     reviewDate: '2025-01-22', 
+        //     reviewTitle: '추천합니다',
+        //     rating: 3,
+        //     reviewContent: '추천하는 상품입니다',
+        //     reviewStatus: '작성완료',
+        // },{
+        //     order: {
+        //         date: '2024-2-18',
+        //         ordernumber: '13572464',
+        //         brand: '브랜드5',
+        //         productname: '크림새우4',
+        //         quantity: 2,
+        //         price: 17800,
+        //         status: '배송완료',
+        //         refundStatus: undefined,
+        //         isPurchased: false
+        //     },
+        //     reviewDate: '2025-01-22', 
+        //     reviewTitle: '추천합니다',
+        //     rating: 3,
+        //     reviewContent: '추천하는 상품입니다',
+        //     reviewStatus: '작성완료',
+        // },
+        // {
+        //     order: {
+        //         date: '2024-2-18',
+        //         ordernumber: '13572465',
+        //         brand: '브랜드5',
+        //         productname: '크림새우5',
+        //         quantity: 2,
+        //         price: 17800,
+        //         status: '배송완료',
+        //         refundStatus: undefined,
+        //         isPurchased: false
+        //     },
+        //     reviewDate: '2025-01-22', 
+        //     reviewTitle: '추천합니다',
+        //     rating: 3,
+        //     reviewContent: '추천하는 상품입니다',
+        //     reviewStatus: '작성완료',
+        // },
+        // {
+        //     order: {
+        //         date: '2024-2-18',
+        //         ordernumber: '13572466',
+        //         brand: '브랜드5',
+        //         productname: '크림새우6',
+        //         quantity: 2,
+        //         price: 17800,
+        //         status: '배송완료',
+        //         refundStatus: undefined,
+        //         isPurchased: false
+        //     },
+        //     reviewDate: '2025-01-22', 
+        //     reviewTitle: '추천합니다',
+        //     rating: 3,
+        //     reviewContent: '추천하는 상품입니다',
+        //     reviewStatus: '작성완료',
+        // },
+        // {
+        //     order: {
+        //         date: '2024-2-18',
+        //         ordernumber: '13572467',
+        //         brand: '브랜드5',
+        //         productname: '크림새우7',
+        //         quantity: 2,
+        //         price: 17800,
+        //         status: '배송완료',
+        //         refundStatus: undefined,
+        //         isPurchased: false
+        //     },
+        //     reviewDate: '2025-01-22', 
+        //     reviewTitle: '추천합니다',
+        //     rating: 3,
+        //     reviewContent: '추천하는 상품입니다',
+        //     reviewStatus: '작성완료',
+        // }
+    ]);
+
+    const handleWriteReview = (orderNumber: string, newReview: Partial<Review>) => {
+        setReviews((prevReviews) =>
+            prevReviews.map((review) =>
+                review.order.ordernumber === orderNumber
+                    ? { ...review, ...newReview, reviewStatus: "작성완료" }
+                    : review
+            )
+        );
+        console.log("📝 handleWriteReview 실행", newReview);
+    };
+
+    const handleEditReview = (orderNumber: string, updatedReview: Partial<Review> ) => {
+        setReviews((prevReviews) =>
+            prevReviews.map((review) =>
+                review.order.ordernumber === orderNumber
+                    ? { ...review, ...updatedReview, reviewStatus:'작성완료' } // ✅ 기존 리뷰 업데이트
+                    : review
+            )
+        );
+    
+        console.log("✏️ handleEditReview 실행", updatedReview);
+    };
+    
+
+    const handleDeleteReview = (orderNumber: string) => {
+        setReviews((prevReviews) =>
+            prevReviews.filter((review) => review.order.ordernumber !== orderNumber)
+        );
+        console.log("handleDeleteReview 실행", orderNumber);
+    };
 
     const filteredReviews = useMemo(() => {
         return selectedTab === 'writable'
@@ -219,14 +249,18 @@ const MyReview: React.FC<MyReviewProps> = ({
                 <MyReviewList
                     selectedTab={selectedTab}
                     reviews={currentReviews}
+                    setReviews={setReviews}
                     onEmptyState={handleEmptyState}
-                    onWriteReview={onWriteReview}
-                    onEditReview={onEditReview}
-                    onDeleteReview={onDeleteReview}
+                    onWriteReview={handleWriteReview}
+                    onEditReview={handleEditReview}
+                    onDeleteReview={handleDeleteReview}
                     isReviewModalOpen={isReviewModalOpen}
                     setIsReviewModalOpen={setIsReviewModalOpen}
+                    isReviewDetailModalOpen={isReviewDetailModalOpen}
+                    setIsReviewDetailModalOpen={setIsReviewDetailModalOpen}
+            
                 />
-                {!isEmpty && !isReviewModalOpen && (
+                {!isEmpty && !isReviewModalOpen && !isReviewDetailModalOpen && (
                     <PaginationContainer>
                     <Pagination
                         currentPage={currentPage}

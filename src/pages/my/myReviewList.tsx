@@ -2,6 +2,7 @@ import React, {useEffect, useMemo, useState} from "react";
 import styled from "styled-components";
 import { Order } from "./myOrderList";
 import ReviewCreateModal from "./reviewCreateModal";
+import ReviewDetailModal from "./reviewDetailModal";
 
 export interface Review {
     order: Order;
@@ -11,36 +12,47 @@ export interface Review {
     reviewContent?: string;
     reviewImages?: string[];
     reviewStatus?: '미작성' | '작성완료';
+    lastDate?: string;
 }
 
 interface MyReviewListprops {
     selectedTab: 'writable' | 'written';
     reviews: Review[];
-    onWriteReview?: (orderNumber: string) => void; 
+    setReviews: React.Dispatch<React.SetStateAction<Review[]>>;
+    onWriteReview?: (orderNumber: string, updateReview: Partial<Review>) => void; 
     onEditReview?: (orderNumber: string, updateReview: Partial<Review>) => void;
     onDeleteReview?: (orderNumber: string) => void;
     onEmptyState?: (isEmpty: boolean) => void;
     isReviewModalOpen: boolean;
     setIsReviewModalOpen: (isOpen: boolean) => void;
+    isReviewDetailModalOpen: boolean;
+    setIsReviewDetailModalOpen: (isOpen: boolean) => void;
 }
 
 const MyReviewList: React.FC<MyReviewListprops> = ({
     selectedTab,
     reviews,
+    setReviews,
     onWriteReview,
     onEditReview,
     onDeleteReview,
     onEmptyState,
     isReviewModalOpen,
     setIsReviewModalOpen,
+    isReviewDetailModalOpen,
+    setIsReviewDetailModalOpen,
     
 }) => {
+
+    console.log("🛠️ MyReviewList props: onWriteReview", onWriteReview);
+    console.log("🛠️ MyReviewList props: onEditReview", onEditReview);
     
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-    
+    const [selectedReview, setSelectedReview] = useState<Review | null>(null);
+   
     const filteredReviews = useMemo(() => {
         if(selectedTab === 'writable') {
-            return reviews.filter((review) => review.order.isPurchased && !review.reviewStatus);
+            return reviews.filter((review) => review.order.isPurchased && review.reviewStatus !== '작성완료');
         }
         return reviews.filter((review) => review.reviewStatus === '작성완료');
     }, [selectedTab, reviews]);
@@ -51,12 +63,67 @@ const MyReviewList: React.FC<MyReviewListprops> = ({
         }
     }, [filteredReviews.length, onEmptyState]);
 
-    const handleReview = (order: Order) => {
+    // review write
+    const handleReviewWrite = (order: Order) => {
         setSelectedOrder(order);
+        setSelectedReview(null);
         setIsReviewModalOpen(true);
     };
 
-    const handleReviewSubmit = () => {
+    // review edit
+    const handleReviewEdit = (review: Review) => {
+        setSelectedReview(review);
+        setSelectedOrder(review.order);
+        setIsReviewModalOpen(true);
+    };
+
+    const handleReviewSubmit = (updatedReviewData: {
+        title: string;
+        content: string;
+        rating: number;
+        image: File | null;
+        reviewDate: string;
+        lastDate?: string;
+        reviewStatus: '미작성' | '작성완료';
+    }) => {
+        if (!selectedOrder) {
+
+            console.log("handleReviewSubmit: 선택된 주문 없음");
+            return;
+        }
+       
+
+        const updatedReview: Review = {
+            order: selectedOrder,
+            reviewTitle: updatedReviewData.title,
+            reviewContent: updatedReviewData.content,
+            rating: updatedReviewData.rating,
+            reviewImages: updatedReviewData.image ? [URL.createObjectURL(updatedReviewData.image)] : [],
+            reviewDate: updatedReviewData.reviewDate,
+            lastDate: updatedReviewData.lastDate,
+            reviewStatus: '작성완료',
+        };
+
+        console.log(" MyReviewList: handleReviewSubmit 실행", updatedReview);
+
+
+        setReviews((prevReviews) => {
+            // 수정된 리뷰를 찾아 덮어쓰고, 나머지 리뷰는 그대로 두기
+            const updatedReviews = prevReviews.filter(
+                (review) => review.order.ordernumber !== updatedReview.order.ordernumber
+            );
+            updatedReviews.push(updatedReview);
+
+            updatedReviews.sort((a, b) => {
+                const aDate = a.lastDate ? new Date(a.lastDate).getTime() : new Date(a.reviewDate || '').getTime();
+                const bDate = b.lastDate ? new Date(b.lastDate).getTime() : new Date(b.reviewDate || '').getTime();
+                return bDate - aDate;
+            });
+
+            return updatedReviews;
+
+        });
+
         setIsReviewModalOpen(false);
     };
 
@@ -93,7 +160,7 @@ const MyReviewList: React.FC<MyReviewListprops> = ({
                                 <TableCell>{review.order.price}</TableCell>
                                 <TableCell>{review.order.status}</TableCell>
                                 <TableCell>
-                                    <Button onClick={() => handleReview(review.order)}>
+                                    <Button onClick={() => handleReviewWrite(review.order)}>
                                         리뷰작성
                                     </Button>
                                 </TableCell>
@@ -110,6 +177,15 @@ const MyReviewList: React.FC<MyReviewListprops> = ({
             {isReviewModalOpen && selectedOrder && (
                 <ReviewCreateModal
                 order={selectedOrder}
+                existingReview={selectedReview ? {
+                    title: selectedReview.reviewTitle || '',
+                    content: selectedReview.reviewContent || '',
+                    rating: selectedReview.rating ?? 0,
+                    image: selectedReview.reviewImages?.[0],
+                    reviewDate: selectedReview.reviewDate,
+                    lastDate: selectedReview.lastDate,
+                    reviewStatus: selectedReview.reviewStatus || '미작성',
+                } : undefined}
                 onClose={() => setIsReviewModalOpen(false)}
                 onSubmit={handleReviewSubmit}/>
             )}
@@ -121,6 +197,7 @@ const MyReviewList: React.FC<MyReviewListprops> = ({
         {selectedTab === 'written' && (
             <>
             <OrderContainer>
+                {filteredReviews.length > 0 ? (
                 <ListContainer>
                     <thead>
                         <TableHeader>
@@ -142,17 +219,51 @@ const MyReviewList: React.FC<MyReviewListprops> = ({
                                     <div>[{review.order.ordernumber}]</div>
                                 </TableCell>
                                 <TableCell>[{review.order.brand}] {review.order.productname}</TableCell>
-                                <TableCell>{review.reviewContent}</TableCell>
+                                <TableCell 
+                                    style={{cursor: 'pointer'}}
+                                    onClick={() => {
+                                        setSelectedReview(review);
+                                        setIsReviewDetailModalOpen(true);
+                                    }}>
+                                        {review.reviewContent}</TableCell>
                                 <TableCell>{review.reviewDate}</TableCell>
                                 <TableCell>
-                                    <Button>리뷰수정</Button>
+                                    <Button onClick={()=> handleReviewEdit(review)}>리뷰수정</Button>
                                 </TableCell>
                                 </TableRow>
                         ))}
                     </tbody>
                 </ListContainer>
+                ) : (
+                    <EmptyMessage>작성한 리뷰가 없습니다</EmptyMessage>
+                )}
 
             </OrderContainer>
+
+            {isReviewDetailModalOpen && selectedReview && (
+                <ReviewDetailModal
+                review={selectedReview}
+                onClose={() => {
+                    setIsReviewDetailModalOpen(false)
+                }}
+                />
+            )}
+
+            {isReviewModalOpen && selectedOrder && (
+                <ReviewCreateModal
+                order={selectedOrder}
+                existingReview={selectedReview ? {
+                    title: selectedReview.reviewTitle || '',
+                    content: selectedReview.reviewContent || '',
+                    rating: selectedReview.rating ?? 0,
+                    image: selectedReview.reviewImages?.[0],
+                    reviewDate: selectedReview.reviewDate,
+                    lastDate: selectedReview.lastDate,
+                    reviewStatus: selectedReview.reviewStatus || '미작성',
+                } : undefined}
+                onClose={() => setIsReviewModalOpen(false)}
+                onSubmit={handleReviewSubmit}/>
+            )}
 
             </>
         )}
