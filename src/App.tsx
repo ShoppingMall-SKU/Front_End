@@ -1,9 +1,10 @@
 import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { MainPage } from "./pages/main/mainPage";
 import { NavBar } from "./components/navBar";
 import { Footer } from "./components/footer";
 import { ProductDetail } from "./pages/product/productDetail";
+import { CartPage } from "./pages/cart/cartPage";
 
 import JoinPage from "./pages/login/joinPage";
 import LoginPage from "./pages/login/loginPage"
@@ -12,6 +13,7 @@ import MyModify from "./pages/my/myModify";
 import MyReview from "./pages/my/myReview";
 import MyQA from "./pages/my/myQA";
 import JoinFormPage from "./pages/login/joinFormPage";
+
 
 
 
@@ -34,6 +36,7 @@ const App = () => {
                <Route path="/my/modify" element={<MyModify />} /> 
                <Route path="/my/review" element={<MyReview />} />
                <Route path="/my/question" element={<MyQA />} />
+               <Route path="/cart/page" element={<CartPage />} />
 
             </Routes>
          </BrowserRouter>
