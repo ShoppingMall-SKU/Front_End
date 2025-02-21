@@ -42,18 +42,16 @@ export const NavBar = () => {
                </ul>
             </div>
 
-            <p
-               className="text-6xl pl-10 flex font-extrabold"
-               style={{ color: "#FF5D5D" }}
-            >
+            {/* Meal Kart 클릭 시 메인 페이지 이동 */}
+            <Link to="/" className="text-6xl pl-10 flex font-extrabold" style={{ color: "#FF5D5D" }}>
                Meal Kart
-            </p>
+            </Link>
 
             <div className="flex gap-2 pt-4 items-start">
                <div className="p-4 hover:bg-base-200 rounded-full hover:cursor-pointer">
                   <FaRegUser className="text-black size-8" />
                </div>
-               <Link to="/cart/pop">
+               <Link to="/cart/page">
                   <div className="p-4 hover:bg-base-200 rounded-full hover:cursor-pointer items-end">
                      <div className="indicator">
                         {number > 0 && (
