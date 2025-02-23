@@ -1,6 +1,7 @@
 import { AiOutlineShoppingCart } from "react-icons/ai";
 import { FaRegUser } from "react-icons/fa";
 import { PiListBold } from "react-icons/pi";
+import { Link } from "react-router-dom";
 
 export const NavBar = () => {
    const number = 1;
@@ -14,7 +15,7 @@ export const NavBar = () => {
          </div>
 
          <div className="navbar bg-base-100 flex px-10 justify-between items-center">
-            <div className="dropdown ">
+            <div className="dropdown">
                <button className="btn bg-base-color hover:bg-red-400 focus:outline-none">
                   <PiListBold className="size-6 text-white" />
                </button>
@@ -40,26 +41,30 @@ export const NavBar = () => {
                   </li>
                </ul>
             </div>
+
             <p
-               className="text-6xl pl-10 flex font-extrabold "
+               className="text-6xl pl-10 flex font-extrabold"
                style={{ color: "#FF5D5D" }}
             >
                Meal Kart
             </p>
-            <div className="gap-2 pt-4 items-start">
+
+            <div className="flex gap-2 pt-4 items-start">
                <div className="p-4 hover:bg-base-200 rounded-full hover:cursor-pointer">
                   <FaRegUser className="text-black size-8" />
                </div>
-               <div className="p-4 hover:bg-base-200 rounded-full hover:cursor-pointer items-end">
-                  <div className="indicator">
-                     {number > 0 && (
-                        <span className="indicator-item badge px-2 items-center bg-red-600 text-white font-bold text-xs">
-                           {number > 10 ? "9+" : number}
-                        </span>
-                     )}
-                     <AiOutlineShoppingCart className="text-black size-8 " />
+               <Link to="/cart/pop">
+                  <div className="p-4 hover:bg-base-200 rounded-full hover:cursor-pointer items-end">
+                     <div className="indicator">
+                        {number > 0 && (
+                           <span className="indicator-item badge px-2 items-center bg-red-600 text-white font-bold text-xs">
+                              {number > 10 ? "9+" : number}
+                           </span>
+                        )}
+                        <AiOutlineShoppingCart className="text-black size-8" />
+                     </div>
                   </div>
-               </div>
+               </Link>
             </div>
          </div>
       </div>

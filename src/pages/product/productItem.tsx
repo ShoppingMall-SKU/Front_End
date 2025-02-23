@@ -22,6 +22,7 @@ export const ProductItem = ({product} : props) => {
                 <p className="font-extrabold text-xl">{product.price.toLocaleString()}원</p> 
                 <p><IoStar className="fill-orange-400"/></p>
                 <p className="text-gray-500 text-sm font-bold">4.7</p>
+                
             </div>
         </div>
     )
