@@ -26,14 +26,18 @@ const App = () => {
             {!ignoreNavPaths.includes(window.location.pathname) && <NavBar />} 
             <Routes>
                <Route path="/" element={<MainPage />} />
+
                <Route path="/member/login" element={<LoginPage />} />
                <Route path="/member/joinform" element={<JoinFormPage />} />
                <Route path="/member/join" element={<JoinPage />} />
+
                <Route path="/my/order" element={<MyOrder />} />
                <Route path="/my/modify" element={<MyModify />} /> 
                <Route path="/my/review" element={<MyReview />} />
                <Route path="/my/question" element={<MyQA />} />
+               
                <Route path="/cart/page" element={<CartPage />} />
+               <Route path="/product/:name" element={<ProductDetail />} />
             </Routes>
             <Footer />
          </div>
