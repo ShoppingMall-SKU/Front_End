@@ -103,6 +103,7 @@ const Title = styled.h1`
     text-align: center;
 `;
 
+
 const ListContainer = styled.div`
     width: 100%;
     max-width: 1000px;
