@@ -13,6 +13,8 @@ import MyModify from "./pages/my/myModify";
 import MyReview from "./pages/my/myReview";
 import MyQA from "./pages/my/myQA";
 import JoinFormPage from "./pages/login/joinFormPage";
+import OrderPage from "./pages/order/orderPage";
+import MyPageOrderStatus from "./pages/my/myPageOrderStatus";
 
 
 
@@ -38,6 +40,9 @@ const App = () => {
                
                <Route path="/cart/page" element={<CartPage />} />
                <Route path="/product/:name" element={<ProductDetail />} />
+               <Route path="/myPage_" element={<MyPageOrderStatus />} />
+               
+               <Route path="/order" element={<OrderPage />} />
             </Routes>
             <Footer />
          </div>

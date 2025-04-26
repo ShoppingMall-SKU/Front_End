@@ -1,11 +1,15 @@
-import { useParams } from "react-router-dom";
+import { useParams,  useNavigate } from "react-router-dom";
 import { productList } from "../../Data";
 import { FaShoppingCart } from "react-icons/fa";
 import { useState } from "react";
+import { Link } from 'react-router-dom';
+
 
 export const ProductDetail = () => {
     const { name } = useParams();
     const decodedName = decodeURIComponent(name ?? "");
+    const navigate = useNavigate(); // ✅ 추가
+
 
     const product = productList.find((p) => p.name === decodedName);
 
@@ -17,11 +21,11 @@ export const ProductDetail = () => {
 
     // 리뷰 데이터(걍 우선 피그마대로 넣음)
     const reviews = [
-        { user: "user1", rating: 5, date: "2024.12.22", text: "간편하게 먹기 좋아요" },
-        { user: "user2", rating: 5, date: "2024.12.20", text: "맛있어요" },
-        { user: "user3", rating: 5, date: "2024.12.16", text: "념념념" },
-        { user: "user4", rating: 5, date: "2024.12.16", text: "맛있어요" },
-        { user: "user5", rating: 5, date: "2024.12.16", text: "냠냠냠" },
+        { user: "user1", rating: "★★★★★", date: "2024.12.22", text: "간편하게 먹기 좋아요" },
+        { user: "user2", rating: "★★★★★", date: "2024.12.20", text: "맛있어요" },
+        { user: "user3", rating: "★★★★★", date: "2024.12.16", text: "념념념" },
+        { user: "user4", rating: "★★★★★", date: "2024.12.16", text: "맛있어요" },
+        { user: "user5", rating: "★★★★★", date: "2024.12.16", text: "냠냠냠" },
     ];
 
     // 상품문의 데이터
@@ -37,7 +41,7 @@ export const ProductDetail = () => {
 
 
     // 장바구니 개수 업데이트 함수
-    const updateCartCount = (cart) => {
+    const updateCartCount = (cart: any[]) => {
         const uniqueItemCount = new Set(cart.map((item) => item.name)).size;
         localStorage.setItem("cartCount", JSON.stringify(uniqueItemCount));
         window.dispatchEvent(new Event("storage")); // NavBar 업데이트 트리거
@@ -46,7 +50,7 @@ export const ProductDetail = () => {
     // 장바구니에 상품 추가하는 함수
     const addToCart = () => {
         const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-        const existingItemIndex = cart.findIndex((item) => item.name === product.name);
+        const existingItemIndex = cart.findIndex((item: { name: string; }) => item.name === product.name);
         
         if (existingItemIndex !== -1) {
             cart[existingItemIndex].quantity += quantity;
@@ -59,7 +63,21 @@ export const ProductDetail = () => {
         alert("장바구니에 추가되었습니다!");
     };
 
+    // ✅ 바로구매 버튼 클릭 시 OrderPage로 이동
+    const handleBuyNow = () => {
+         const orderItem = {
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            quantity: quantity,
+            image: product.img,       // ✅ 이미지 포함
+            deliveryFee: shippingFee
+        };
     
+        navigate("/order", { state: { items: [orderItem] } });
+    };
+
+
 
     return (
         <div className="flex flex-col items-center w-full bg-white min-h-screen py-10">
@@ -104,7 +122,7 @@ export const ProductDetail = () => {
                             onClick={addToCart}>
                             <FaShoppingCart /> 장바구니
                         </button>
-                        <button className="bg-red-500 text-white px-8 py-3 rounded-md hover:bg-red-600 text-lg font-semibold">
+                        <button className="bg-red-500 text-white px-8 py-3 rounded-md hover:bg-red-600 text-lg font-semibold" onClick={handleBuyNow} >
                             바로구매
                         </button>
                     </div>
@@ -141,16 +159,18 @@ export const ProductDetail = () => {
                     </div>
 
                     {/* 리뷰 작성 버튼을 오른쪽 정렬 */}
-                    <button className="border border-gray-400 px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100 ml-auto">
-                        리뷰 작성하기
-                    </button>
+                    <Link to="/my/review">
+                        <button className="border border-gray-400 px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100 ml-auto float-right">
+                            리뷰 작성하기
+                        </button>
+                    </Link>
                 </div>
 
                 {/* 리뷰 리스트 */}
                 <div className="border-b pb-4">
                     {reviews.map((review, index) => (
                         <div key={index} className="mt-4 pt-4 pb-4 border-b gap-1">
-                            <p className="font-semibold text-orange-500">★★★★★</p>
+                            <p className="font-semibold text-orange-500">{review.rating}</p>
                             <p className="text-gray-500">{review.user} | {review.date}</p>
                             <p className="text-gray-500">{review.text}</p>
                         </div>
