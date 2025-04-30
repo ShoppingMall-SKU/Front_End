@@ -22,6 +22,9 @@ import JoinFormPage from "./pages/login/joinFormPage";
 import OrderPage from "./pages/order/orderPage";
 import MyPageOrderStatus from "./pages/my/myPageOrderStatus";
 
+
+
+
 const App = () => {
   const ignoreNavPaths = ["", ""];
 
@@ -38,23 +41,6 @@ const App = () => {
           <Route path="/member/joinform" element={<JoinFormPage />} />
           <Route path="/member/join" element={<JoinPage />} />
 
-<<<<<<< HEAD
-               <Route path="/my/order" element={<MyOrder />} />
-               <Route path="/my/modify" element={<MyModify />} /> 
-               <Route path="/my/review" element={<MyReview />} />
-               <Route path="/my/question" element={<MyQA />} />
-               
-               <Route path="/cart/page" element={<CartPage />} />
-               <Route path="/product/:name" element={<ProductDetail />} />
-               <Route path="/myPage_" element={<MyPageOrderStatus />} />
-               
-               <Route path="/order" element={<OrderPage />} />
-            </Routes>
-            <Footer />
-         </div>
-      </BrowserRouter>
-   );
-=======
           <Route path="/my" element={<Navigate to="/my/order" replace />} />
           <Route path="/my/order" element={<MyOrder />} />
           <Route path="/my/modify" element={<MyModify />} />
@@ -63,12 +49,18 @@ const App = () => {
 
           <Route path="/cart/page" element={<CartPage />} />
           <Route path="/product/:name" element={<ProductDetail />} />
-        </Routes>
-        <Footer />
+
+          <Route path="/myPage_" element={<MyPageOrderStatus />} />  
+          <Route path="/order" element={<OrderPage />} />
+
+          </Routes>
+         <Footer />
       </div>
-    </BrowserRouter>
-  );
->>>>>>> 4a957245d470a08abb45cc4577185185d60689db
+   </BrowserRouter>
+   );
 };
 
 export default App;
+
+
+      

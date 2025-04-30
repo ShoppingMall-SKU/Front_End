@@ -2,7 +2,9 @@ import { useParams,  useNavigate } from "react-router-dom";
 import { productList } from "../../Data";
 import { FaShoppingCart } from "react-icons/fa";
 import { useState } from "react";
-import { Link } from 'react-router-dom';
+import InquiryWriteModal from "../my/inquiryWriteModal";
+import ReviewCreateModal from "../my/reviewCreateModal";
+
 
 
 /**
@@ -24,8 +26,13 @@ export const ProductDetail = () => {
     "최신순" | "별점높은순" | "별점낮은순"
   >("최신순");
 
+
+  // 모달영역 합칠때 추가
+  const [isReviewModalOpen, setReviewModalOpen] = useState(false);
+  const [isInquiryModalOpen, setInquiryModalOpen] = useState(false);
+
   // 리뷰 데이터(걍 우선 피그마대로 넣음)
-  const reviews = [
+  const [reviews, setReviews] = useState([ // 변경됨: useState로 상태 관리, 모달추가 과정에서 수정
     {
       user: "user1",
       rating: "★★★★★",
@@ -36,10 +43,10 @@ export const ProductDetail = () => {
     { user: "user3", rating: "★★★★★", date: "2024.12.16", text: "념념념" },
     { user: "user4", rating: "★★★★★", date: "2024.12.16", text: "맛있어요" },
     { user: "user5", rating: "★★★★★", date: "2024.12.16", text: "냠냠냠" },
-  ];
+  ]);
 
   // 상품문의 데이터
-  const inquiries = [
+  const [inquiries, setInquiries] = useState([ // 변경됨: useState로 상태로 관리, 모달추가 과정에서 수정
     {
       user: "user1",
       date: "2024.11.26",
@@ -52,7 +59,7 @@ export const ProductDetail = () => {
       text: "기타문의입니다. (답변완료아닐때)",
       type: "답변대기",
     },
-  ];
+  ]);
 
   if (!product) {
     return (
@@ -91,14 +98,14 @@ export const ProductDetail = () => {
         alert("장바구니에 추가되었습니다!");
     };
 
-    // ✅ 바로구매 버튼 클릭 시 OrderPage로 이동
+    // 바로구매 버튼 클릭 시 OrderPage로 이동
     const handleBuyNow = () => {
          const orderItem = {
             id: product.id,
             name: product.name,
             price: product.price,
             quantity: quantity,
-            image: product.img,       // ✅ 이미지 포함
+            image: product.img,       // 이미지 포함
             deliveryFee: shippingFee
         };
     
@@ -230,11 +237,10 @@ export const ProductDetail = () => {
           </div>
 
           {/* 리뷰 작성 버튼을 오른쪽 정렬 */}
-                    <Link to="/my/review">
-              <button className="border border-gray-400 px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100 ml-auto float-right">
-                리뷰 작성하기
-              </button>
-                    </Link>
+            <button className="border border-gray-400 px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100 ml-auto float-right"
+            onClick={() => setReviewModalOpen(true)}>
+               리뷰 작성하기
+            </button>
         </div>
 
         {/* 리뷰 리스트 */}
@@ -258,7 +264,8 @@ export const ProductDetail = () => {
             상품문의{" "}
             <span className="text-orange-500">{inquiries.length}건</span>
           </h2>
-          <button className="border border-gray-400 px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100">
+          <button className="border border-gray-400 px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100"
+          onClick={() => setInquiryModalOpen(true)}>
             상품문의 작성
           </button>
         </div>
@@ -288,6 +295,49 @@ export const ProductDetail = () => {
           </tbody>
         </table>
       </div>
+
+
+      {/* 모달 영역 합칠때 추가(문의부분) */}
+      {isInquiryModalOpen && (
+        <InquiryWriteModal // **수정됨** - 상태를 활용해 실제 데이터 추가
+          onClose={() => setInquiryModalOpen(false)}
+          onSubmit={(title, type, content, image) => {
+            const newInquiry = {
+              user: "user3", // 실제 로그인 유저로 바꿀 수 있음
+              date: new Date().toISOString().split('T')[0],
+              text: content,
+              type: type,
+            };
+            setInquiries((prev) => [...prev, newInquiry]); // **추가됨: 상태 반영**
+            setInquiryModalOpen(false);
+          }}
+        />
+      )}
+
+      {/* 모달 영역 합칠때 추가(리뷰) */}
+      {isReviewModalOpen && (
+        <ReviewCreateModal 
+          onClose={() => setReviewModalOpen(false)}
+          order={{
+            id: 1,
+            name: product.name,
+            price: product.price,
+            image: product.img,
+            quantity: quantity,
+            orderDate: new Date().toISOString(),
+          }}
+          onSubmit={(data) => {
+            const newReview = {
+              user: "user6",
+              rating: "★★★★★",
+              date: new Date().toISOString().split('T')[0],
+              text: data.content,
+            };
+            setReviews((prev) => [...prev, newReview]);
+            setReviewModalOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 };
