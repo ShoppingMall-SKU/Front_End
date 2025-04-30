@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
+import { useNavigate } from "react-router-dom";
+
 
 interface CartItem {
   id: number;
@@ -13,6 +15,7 @@ interface CartItem {
 
 export const CartPage = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
+    const navigate = useNavigate();
 
   // localStorage에서 장바구니 데이터 불러와 병합
   useEffect(() => {
@@ -67,11 +70,38 @@ export const CartPage = () => {
     localStorage.setItem("cart", JSON.stringify(updatedCart));
   };
 
+
+
+    // 주문 버튼 클릭 시 주문 페이지로 이동
+    const handleOrder = () => {
+      const selectedItems = cart
+        .filter((item) => item.selected)
+        .map((item) => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          image: item.img,
+          deliveryFee: item.shipping
+        }));
+    
+      if (selectedItems.length === 0) {
+        alert("주문할 상품을 선택해주세요.");
+        return;
+      }
+    
+      navigate("/order", { state: { items: selectedItems } });
+    };
+    
+
+    
+
+
   // 주문 관련 데이터 계산
   const selectedItems = cart.filter((item) => item.selected);
   const totalPrice = selectedItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const totalShipping = selectedItems.reduce((acc, item) => acc + item.shipping, 0);
-  const discount = Math.floor(totalPrice * 0.02);
+  const discount = Math.floor(totalPrice * 0.01);
   const finalPrice = totalPrice - discount + totalShipping;
 
   return (
@@ -157,7 +187,7 @@ export const CartPage = () => {
             <span>총 결제 금액</span>
             <span>{finalPrice.toLocaleString()} 원</span>
           </div>
-          <button className="w-full bg-red-500 text-white py-2 rounded-lg mt-4 hover:bg-red-600">
+          <button className="w-full bg-red-500 text-white py-2 rounded-lg mt-4 hover:bg-red-600" onClick={handleOrder}>
             주문하기
           </button>
         </div>

@@ -1,7 +1,11 @@
-import { useParams } from "react-router-dom";
+import { useParams,  useNavigate } from "react-router-dom";
 import { productList } from "../../Data";
 import { FaShoppingCart } from "react-icons/fa";
 import { useState } from "react";
+import InquiryWriteModal from "../my/inquiryWriteModal";
+import ReviewCreateModal from "../my/reviewCreateModal";
+
+
 
 /**
  *  상품 문의 작성 모달
@@ -9,8 +13,8 @@ import { useState } from "react";
  */
 
 export const ProductDetail = () => {
-  const { name } = useParams();
-  const decodedName = decodeURIComponent(name ?? "");
+    const { name } = useParams();
+    const decodedName = decodeURIComponent(name ?? "");
 
   const product = productList.find((p) => p.name === decodedName);
 
@@ -22,22 +26,27 @@ export const ProductDetail = () => {
     "최신순" | "별점높은순" | "별점낮은순"
   >("최신순");
 
+
+  // 모달영역 합칠때 추가
+  const [isReviewModalOpen, setReviewModalOpen] = useState(false);
+  const [isInquiryModalOpen, setInquiryModalOpen] = useState(false);
+
   // 리뷰 데이터(걍 우선 피그마대로 넣음)
-  const reviews = [
+  const [reviews, setReviews] = useState([ // 변경됨: useState로 상태 관리, 모달추가 과정에서 수정
     {
       user: "user1",
-      rating: 5,
+      rating: "★★★★★",
       date: "2024.12.22",
       text: "간편하게 먹기 좋아요",
     },
-    { user: "user2", rating: 5, date: "2024.12.20", text: "맛있어요" },
-    { user: "user3", rating: 5, date: "2024.12.16", text: "념념념" },
-    { user: "user4", rating: 5, date: "2024.12.16", text: "맛있어요" },
-    { user: "user5", rating: 5, date: "2024.12.16", text: "냠냠냠" },
-  ];
+    { user: "user2", rating: "★★★★★", date: "2024.12.20", text: "맛있어요" },
+    { user: "user3", rating: "★★★★★", date: "2024.12.16", text: "념념념" },
+    { user: "user4", rating: "★★★★★", date: "2024.12.16", text: "맛있어요" },
+    { user: "user5", rating: "★★★★★", date: "2024.12.16", text: "냠냠냠" },
+  ]);
 
   // 상품문의 데이터
-  const inquiries = [
+  const [inquiries, setInquiries] = useState([ // 변경됨: useState로 상태로 관리, 모달추가 과정에서 수정
     {
       user: "user1",
       date: "2024.11.26",
@@ -50,7 +59,7 @@ export const ProductDetail = () => {
       text: "기타문의입니다. (답변완료아닐때)",
       type: "답변대기",
     },
-  ];
+  ]);
 
   if (!product) {
     return (
@@ -67,34 +76,41 @@ export const ProductDetail = () => {
    */
 
   // 장바구니 개수 업데이트 함수
-  const updateCartCount = (cart) => {
+  const updateCartCount = (cart: any[]) => {
     const uniqueItemCount = new Set(cart.map((item) => item.name)).size;
     localStorage.setItem("cartCount", JSON.stringify(uniqueItemCount));
     window.dispatchEvent(new Event("storage")); // NavBar 업데이트 트리거
   };
 
-  // 장바구니에 상품 추가하는 함수
-  const addToCart = () => {
-    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-    const existingItemIndex = cart.findIndex(
-      (item) => item.name === product.name
-    );
+    // 장바구니에 상품 추가하는 함수
+    const addToCart = () => {
+        const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+        const existingItemIndex = cart.findIndex((item) => item.name === product.name);
+        
+        if (existingItemIndex !== -1) {
+            cart[existingItemIndex].quantity += quantity;
+        } else {
+            cart.push({ ...product, quantity, selected: true, shipping: shippingFee });
+        }
+        
+        localStorage.setItem("cart", JSON.stringify(cart));
+        updateCartCount(cart);
+        alert("장바구니에 추가되었습니다!");
+    };
 
-    if (existingItemIndex !== -1) {
-      cart[existingItemIndex].quantity += quantity;
-    } else {
-      cart.push({
-        ...product,
-        quantity,
-        selected: true,
-        shipping: shippingFee,
-      });
-    }
-
-    localStorage.setItem("cart", JSON.stringify(cart));
-    updateCartCount(cart);
-    alert("장바구니에 추가되었습니다!");
-  };
+    // 바로구매 버튼 클릭 시 OrderPage로 이동
+    const handleBuyNow = () => {
+         const orderItem = {
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            quantity: quantity,
+            image: product.img,       // 이미지 포함
+            deliveryFee: shippingFee
+        };
+    
+        navigate("/order", { state: { items: [orderItem] } });
+    };
 
   /**
      * 작성된 문의 데이터 처리
@@ -114,7 +130,7 @@ export const ProductDetail = () => {
      *  setInquiries(prev => [...prev, newInquiry]);
      * };
 
-     */
+ */
 
   return (
     <div className="flex flex-col items-center w-full bg-white min-h-screen py-10">
@@ -184,7 +200,7 @@ export const ProductDetail = () => {
               onClick={addToCart}>
               <FaShoppingCart /> 장바구니
             </button>
-            <button className="bg-red-500 text-white px-8 py-3 rounded-md hover:bg-red-600 text-lg font-semibold">
+            <button className="bg-red-500 text-white px-8 py-3 rounded-md hover:bg-red-600 text-lg font-semibold" onClick={handleBuyNow} >
               바로구매
             </button>
           </div>
@@ -221,16 +237,17 @@ export const ProductDetail = () => {
           </div>
 
           {/* 리뷰 작성 버튼을 오른쪽 정렬 */}
-          <button className="border border-gray-400 px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100 ml-auto">
-            리뷰 작성하기
-          </button>
+            <button className="border border-gray-400 px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100 ml-auto float-right"
+            onClick={() => setReviewModalOpen(true)}>
+               리뷰 작성하기
+            </button>
         </div>
 
         {/* 리뷰 리스트 */}
         <div className="border-b pb-4">
           {reviews.map((review, index) => (
             <div key={index} className="mt-4 pt-4 pb-4 border-b gap-1">
-              <p className="font-semibold text-orange-500">★★★★★</p>
+              <p className="font-semibold text-orange-500">{review.rating}</p>
               <p className="text-gray-500">
                 {review.user} | {review.date}
               </p>
@@ -247,7 +264,8 @@ export const ProductDetail = () => {
             상품문의{" "}
             <span className="text-orange-500">{inquiries.length}건</span>
           </h2>
-          <button className="border border-gray-400 px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100">
+          <button className="border border-gray-400 px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100"
+          onClick={() => setInquiryModalOpen(true)}>
             상품문의 작성
           </button>
         </div>
@@ -277,6 +295,49 @@ export const ProductDetail = () => {
           </tbody>
         </table>
       </div>
+
+
+      {/* 모달 영역 합칠때 추가(문의부분) */}
+      {isInquiryModalOpen && (
+        <InquiryWriteModal // **수정됨** - 상태를 활용해 실제 데이터 추가
+          onClose={() => setInquiryModalOpen(false)}
+          onSubmit={(title, type, content, image) => {
+            const newInquiry = {
+              user: "user3", // 실제 로그인 유저로 바꿀 수 있음
+              date: new Date().toISOString().split('T')[0],
+              text: content,
+              type: type,
+            };
+            setInquiries((prev) => [...prev, newInquiry]); // **추가됨: 상태 반영**
+            setInquiryModalOpen(false);
+          }}
+        />
+      )}
+
+      {/* 모달 영역 합칠때 추가(리뷰) */}
+      {isReviewModalOpen && (
+        <ReviewCreateModal 
+          onClose={() => setReviewModalOpen(false)}
+          order={{
+            id: 1,
+            name: product.name,
+            price: product.price,
+            image: product.img,
+            quantity: quantity,
+            orderDate: new Date().toISOString(),
+          }}
+          onSubmit={(data) => {
+            const newReview = {
+              user: "user6",
+              rating: "★★★★★",
+              date: new Date().toISOString().split('T')[0],
+              text: data.content,
+            };
+            setReviews((prev) => [...prev, newReview]);
+            setReviewModalOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 };

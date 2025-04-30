@@ -19,6 +19,11 @@ import MyModify from "./pages/my/myModify";
 import MyReview from "./pages/my/myReview";
 import MyInquiry from "./pages/my/myInquiry";
 import JoinFormPage from "./pages/login/joinFormPage";
+import OrderPage from "./pages/order/orderPage";
+import MyPageOrderStatus from "./pages/my/myPageOrderStatus";
+
+
+
 
 const App = () => {
   const ignoreNavPaths = ["", ""];
@@ -44,11 +49,18 @@ const App = () => {
 
           <Route path="/cart/page" element={<CartPage />} />
           <Route path="/product/:name" element={<ProductDetail />} />
-        </Routes>
-        <Footer />
+
+          <Route path="/myPage_" element={<MyPageOrderStatus />} />  
+          <Route path="/order" element={<OrderPage />} />
+
+          </Routes>
+         <Footer />
       </div>
-    </BrowserRouter>
-  );
+   </BrowserRouter>
+   );
 };
 
 export default App;
+
+
+      
